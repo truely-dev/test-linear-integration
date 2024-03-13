@@ -37,5 +37,5 @@ jobs:
                         --arg stateId "$NEW_STATUS" \
                         '{query: "mutation IssueBatchUpdate($input: IssueUpdateInput!, $ids: [UUID!]!) { issueBatchUpdate(input: $input, ids: $ids) { issues { id } } }", variables: {input: {stateId: $stateId}, ids: $ids}}')
           
-          curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $LINEAR_API_KEY" \
+          curl -X POST -H "Content-Type: application/json" -H "Authorization: $LINEAR_API_KEY" \
             --data "$JSON_DATA" https://api.linear.app/graphql
