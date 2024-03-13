@@ -1,2 +1,2 @@
 # test-linear-integration
-testing 2
+testing 10
