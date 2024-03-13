@@ -2,6 +2,7 @@
 
 STATE_ID="7db1c39e-bc7e-4c54-8ba9-eb0511002041"
 echo $STATE_ID
+echo $LINEAR_API_TOKEN
 
  # Fetch the last 100 commits
 git fetch --all
