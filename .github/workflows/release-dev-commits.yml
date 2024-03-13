@@ -21,21 +21,24 @@ jobs:
           MATCHES=$(echo "$COMMITS" | grep -oP "Merge pull request.*tes-\K[0-9]+")
           ISSUES=""
           for MATCH in $MATCHES; do
-            ISSUE="TRU-$MATCH"
-            ISSUES+='"'$(echo $ISSUE | tr '[:lower:]' '[:upper:]')'", '
+            # Convert to uppercase and format the issue ID
+            ISSUES+="TRU-${MATCH^^} "
           done
-          ISSUES="[${ISSUES%??}]" # Formats the list of issues as a JSON array, removing the final comma
-          echo "ISSUES_JSON=$ISSUES" >> $GITHUB_ENV
+          echo "ISSUES=$ISSUES" >> $GITHUB_ENV
 
       - name: Update Linear issue status
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
         run: |
-          NEW_STATUS='7db1c39e-bc7e-4c54-8ba9-eb0511002041' # Your specific status ID
-          JSON_DATA=$(jq -n \
-                        --argjson ids "$ISSUES_JSON" \
-                        --arg stateId "$NEW_STATUS" \
-                        '{query: "mutation IssueBatchUpdate($input: IssueUpdateInput!, $ids: [UUID!]!) { issueBatchUpdate(input: $input, ids: $ids) { issues { id } } }", variables: {input: {stateId: $stateId}, ids: $ids}}')
-          
-          curl -X POST -H "Content-Type: application/json" -H "Authorization: $LINEAR_API_KEY" \
-            --data "$JSON_DATA" https://api.linear.app/graphql
+          for ISSUE in $ISSUES; do
+            # The ISSUE variable is already in uppercase as formatted in the previous step.
+            NEW_STATUS='7db1c39e-bc7e-4c54-8ba9-eb0511002041'
+            curl -X POST -H "Content-Type: application/json" -H "Authorization: $LINEAR_API_KEY" \
+            --data '{
+              "query": "mutation($id: String!, $stateId: String!) { issueUpdate(id: $id, input: { stateId: $stateId }) { success } }",
+              "variables": {
+                "id": "'$ISSUE'", # Ensure this matches Linear's expected ID format.
+                "stateId": "'$NEW_STATUS'"
+              }
+            }' https://api.linear.app/graphql
+          done
