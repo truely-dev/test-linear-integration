@@ -21,7 +21,7 @@ jobs:
         run: |
           curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $LINEAR_API_KEY" \
           --data '{
-            "query": "mutation($id: String!, $stateId: String!) { updateIssue(id: $id, input: { stateId: $stateId }) { success } }",
+            "query": "mutation($id: String!, $stateId: String!) { issueUpdate(id: $id, input: { stateId: $stateId }) { success } }",
             "variables": {
               "id": "$ISSUE_ID",
               "stateId": "$NEW_STATUS"
