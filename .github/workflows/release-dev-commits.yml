@@ -21,8 +21,7 @@ jobs:
           MATCHES=$(echo "$COMMITS" | grep -oP "Merge pull request.*tes-\K[0-9]+")
           ISSUES=""
           for MATCH in $MATCHES; do
-            # Convert to uppercase and format the issue ID
-            ISSUES+=$(echo "TRU-$MATCH" | tr '[:lower:]' '[:upper:]')' '
+            ISSUES+="TRU-$MATCH "
           done
           echo "ISSUES=$ISSUES" >> $GITHUB_ENV
 
@@ -31,13 +30,15 @@ jobs:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
         run: |
           for ISSUE in $ISSUES; do
-            # The ISSUE variable is already in uppercase as formatted in the previous step.
+            # Note: You'll need to map the extracted ISSUE to its corresponding Linear issue ID.
+            # The following is a placeholder for how you might perform the update.
+            # Replace `NEW_STATUS` with the appropriate status ID for your Linear setup.
             NEW_STATUS='7db1c39e-bc7e-4c54-8ba9-eb0511002041'
             curl -X POST -H "Content-Type: application/json" -H "Authorization: $LINEAR_API_KEY" \
             --data '{
               "query": "mutation($id: String!, $stateId: String!) { issueUpdate(id: $id, input: { stateId: $stateId }) { success } }",
               "variables": {
-                "id": "'$ISSUE'", # Ensure this matches Linear's expected ID format.
+                "id": "'$ISSUE'", # This needs to be the Linear issue ID, not just the pattern match.
                 "stateId": "'$NEW_STATUS'"
               }
             }' https://api.linear.app/graphql
