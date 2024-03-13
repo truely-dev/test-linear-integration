@@ -22,7 +22,7 @@ jobs:
           ISSUES=""
           for MATCH in $MATCHES; do
             # Convert to uppercase and format the issue ID
-            ISSUES+="TRU-${MATCH^^} "
+            ISSUES+=$(echo "TRU-$MATCH" | tr '[:lower:]' '[:upper:]')' '
           done
           echo "ISSUES=$ISSUES" >> $GITHUB_ENV
 
