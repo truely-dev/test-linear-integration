@@ -16,14 +16,12 @@ jobs:
       - name: Fetch commits and filter
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
-          ISSUE_ID: 'TES-1' # Assume this is dynamically determined from your script
-          NEW_STATUS: '7db1c39e-bc7e-4c54-8ba9-eb0511002041' # Example status; you'll need the specific status ID
         run: |
-          curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $LINEAR_API_KEY" \
+          curl -X POST -H "Content-Type: application/json" -H "Authorization: $LINEAR_API_KEY" \
           --data '{
             "query": "mutation($id: String!, $stateId: String!) { issueUpdate(id: $id, input: { stateId: $stateId }) { success } }",
             "variables": {
-              "id": "$ISSUE_ID",
-              "stateId": "$NEW_STATUS"
+              "id": "TES-1",
+              "stateId": "7db1c39e-bc7e-4c54-8ba9-eb0511002041"
             }
           }' https://api.linear.app/graphql
