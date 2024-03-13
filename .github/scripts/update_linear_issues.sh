@@ -3,7 +3,7 @@
 STATE_ID="7db1c39e-bc7e-4c54-8ba9-eb0511002041"
  # Fetch the last 100 commits
 git fetch --all
-commits=$(git log -100 --pretty=format:'%H %s')
+commits=$(git log release/dev -100 --pretty=format:'%H %s')
 
 # Find 20 commits matching the pattern and extract issue ids
 issue_ids=$(echo "$commits" | grep -E "^.*Merge pull request.*tes-[0-9]+-.*$" | sed -E 's/.*tes-([0-9]+)-.*/TES-\1/' | tr '[:lower:]' '[:upper:]' | head -20)
