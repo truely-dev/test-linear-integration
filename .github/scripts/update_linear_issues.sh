@@ -1,6 +1,8 @@
 #!/bin/bash
 
 STATE_ID="7db1c39e-bc7e-4c54-8ba9-eb0511002041"
+echo $STATE_ID
+
  # Fetch the last 100 commits
 git fetch --all
 commits=$(git log release/dev -100 --pretty=format:'%H %s')
