@@ -38,8 +38,8 @@ jobs:
             --data '{
               "query": "mutation($id: String!, $stateId: String!) { issueUpdate(id: $id, input: { stateId: $stateId }) { success } }",
               "variables": {
-                "id": "'$ISSUE'", # This needs to be the Linear issue ID, not just the pattern match.
-                "stateId": "'$NEW_STATUS'"
+                "id": '\"'$ISSUE'\"',
+                "stateId": '\"'$NEW_STATUS'\"'
               }
             }' https://api.linear.app/graphql
           done
