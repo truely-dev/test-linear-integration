@@ -12,11 +12,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Git
-        run: |
-          git config --global user.name 'Your Name'
-          git config --global user.email 'you@example.com'
-
       - name: Run update script
         env:
           LINEAR_API_TOKEN: ${{ secrets.LINEAR_API_TOKEN }}
