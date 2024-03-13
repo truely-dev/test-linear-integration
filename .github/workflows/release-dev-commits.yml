@@ -39,7 +39,7 @@ jobs:
                               --arg id "$ISSUE_UPPERCASE" \
                               --arg stateId "$NEW_STATUS" \
                               '{query: "mutation($id: String!, $stateId: String!) { issueUpdate(id: $id, input: { stateId: $stateId }) { success } }", variables: {id: $id, stateId: $stateId}}')
-            
+            echo $JQ_PAYLOAD
             curl -X POST -H "Content-Type: application/json" -H "Authorization: $LINEAR_API_KEY" \
                  --data "$JQ_PAYLOAD" \
                  https://api.linear.app/graphql
