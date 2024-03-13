@@ -30,12 +30,13 @@ jobs:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
         run: |
           for ISSUE in $ISSUES; do
+            ISSUE_UPPERCASE=$(echo "$ISSUE" | tr '[:lower:]' '[:upper:]')
             # Note: You'll need to map the extracted ISSUE to its corresponding Linear issue ID.
             # The following is a placeholder for how you might perform the update.
             # Replace `NEW_STATUS` with the appropriate status ID for your Linear setup.
             NEW_STATUS='7db1c39e-bc7e-4c54-8ba9-eb0511002041'
             JQ_PAYLOAD=$(jq -n \
-                              --arg id "$ISSUE" \
+                              --arg id "$ISSUE_UPPERCASE" \
                               --arg stateId "$NEW_STATUS" \
                               '{query: "mutation($id: String!, $stateId: String!) { issueUpdate(id: $id, input: { stateId: $stateId }) { success } }", variables: {id: $id, stateId: $stateId}}')
             
