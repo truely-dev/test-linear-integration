@@ -1,0 +1,29 @@
+name: Filter Commits Workflow
+
+on:
+  push:
+    branches:
+      - release/dev
+
+jobs:
+  filter-commits:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # Fetch all history for all branches and tags
+
+      - name: Fetch commits and filter
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          ISSUE_ID: 'TES-1' # Assume this is dynamically determined from your script
+          NEW_STATUS: 'Todo' # Example status; you'll need the specific status ID
+        run: |
+          curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $LINEAR_API_KEY" \
+          --data '{
+            "query": "mutation($id: String!, $stateId: String!) { updateIssue(id: $id, input: { stateId: $stateId }) { success } }",
+            "variables": {
+              "id": "$ISSUE_ID",
+              "stateId": "$NEW_STATUS" # You need to replace this with the actual ID of the status you want to set
+            }
+          }' https://api.linear.app/graphql
