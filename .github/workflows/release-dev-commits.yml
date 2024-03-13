@@ -1,0 +1,23 @@
+name: Filter Commits Workflow
+
+on:
+  push:
+    branches:
+      - release/dev
+
+jobs:
+  filter-commits:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # Fetch all history for all branches and tags
+
+      - name: Fetch commits and filter
+        run: |
+          # Fetch the last 20 commits from the release/dev branch
+          COMMITS=$(git log release/dev --pretty=format:"%H %s" -20)
+
+          # Filter commits based on the specified pattern
+          echo "Filtered commits:"
+          echo "$COMMITS" | grep -E "^.*Merge pull request.*tes-[0-9]+-.*$"
