@@ -15,4 +15,4 @@ jobs:
       - name: Run update script
         env:
           LINEAR_API_TOKEN: ${{ secrets.LINEAR_API_TOKEN }}
-        run: bash ${GITHUB_WORKSPACE}/.github/scripts/update_linear_issues.sh
+        run: cat ${GITHUB_WORKSPACE}/.github/scripts/update_linear_issues.sh
