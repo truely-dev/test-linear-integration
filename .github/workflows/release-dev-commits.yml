@@ -17,13 +17,13 @@ jobs:
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
           ISSUE_ID: 'TES-1' # Assume this is dynamically determined from your script
-          NEW_STATUS: 'Todo' # Example status; you'll need the specific status ID
+          NEW_STATUS: '7db1c39e-bc7e-4c54-8ba9-eb0511002041' # Example status; you'll need the specific status ID
         run: |
           curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $LINEAR_API_KEY" \
           --data '{
             "query": "mutation($id: String!, $stateId: String!) { updateIssue(id: $id, input: { stateId: $stateId }) { success } }",
             "variables": {
               "id": "$ISSUE_ID",
-              "stateId": "$NEW_STATUS" # You need to replace this with the actual ID of the status you want to set
+              "stateId": "$NEW_STATUS"
             }
           }' https://api.linear.app/graphql
