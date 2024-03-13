@@ -1,4 +1,4 @@
-name: Filter Commits Workflow
+name: Update Linear Issue Status Based on Commits
 
 on:
   push:
@@ -6,22 +6,36 @@ on:
       - release/dev
 
 jobs:
-  filter-commits:
+  update-linear-issue-status:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0 # Fetch all history for all branches and tags
 
-      - name: Fetch commits and filter
+      - name: Fetch and filter commits
+        id: filter-commits
+        run: |
+          COMMITS=$(git log release/dev --pretty=format:"%H %s" -20)
+          MATCHES=$(echo "$COMMITS" | grep -oP "Merge pull request.*tes-\K[0-9]+")
+          ISSUES=""
+          for MATCH in $MATCHES; do
+            ISSUE="TRU-$MATCH"
+            ISSUES+='"'$(echo $ISSUE | tr '[:lower:]' '[:upper:]')'", '
+          done
+          ISSUES="[${ISSUES%??}]" # Formats the list of issues as a JSON array, removing the final comma
+          echo "ISSUES_JSON=$ISSUES" >> $GITHUB_ENV
+
+      - name: Update Linear issue status
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
         run: |
-          curl -X POST -H "Content-Type: application/json" -H "Authorization: $LINEAR_API_KEY" \
-          --data '{
-            "query": "mutation($id: String!, $stateId: String!) { issueUpdate(id: $id, input: { stateId: $stateId }) { success } }",
-            "variables": {
-              "id": "TES-1",
-              "stateId": "7db1c39e-bc7e-4c54-8ba9-eb0511002041"
-            }
-          }' https://api.linear.app/graphql
+          NEW_STATUS='7db1c39e-bc7e-4c54-8ba9-eb0511002041' # Your specific status ID
+          JSON_DATA=$(jq -n \
+                        --argjson ids "$ISSUES_JSON" \
+                        --arg stateId "$NEW_STATUS" \
+                        '{query: "mutation IssueBatchUpdate($input: IssueUpdateInput!, $ids: [UUID!]!) { issueBatchUpdate(input: $input, ids: $ids) { issues { id } } }", variables: {input: {stateId: $stateId}, ids: $ids}}')
+          
+          curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $LINEAR_API_KEY" \
+            --data "$JSON_DATA" https://api.linear.app/graphql
