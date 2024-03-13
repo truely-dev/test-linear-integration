@@ -1,4 +1,4 @@
-name: Update Linear Issue Status Based on Commits
+name: Update Linear Issues
 
 on:
   push:
@@ -6,42 +6,13 @@ on:
       - release/dev
 
 jobs:
-  update-linear-issue-status:
+  update-issues:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0 # Fetch all history for all branches and tags
 
-      - name: Fetch and filter commits
-        id: filter-commits
-        run: |
-          COMMITS=$(git log release/dev --pretty=format:"%H %s" -20)
-          MATCHES=$(echo "$COMMITS" | grep -oP "Merge pull request.*tes-\K[0-9]+")
-          ISSUES=""
-          for MATCH in $MATCHES; do
-            ISSUES+="TRU-$MATCH "
-          done
-          echo "ISSUES=$ISSUES" >> $GITHUB_ENV
-
-      - name: Update Linear issue status
+      - name: Run update script
         env:
-          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
-        run: |
-          for ISSUE in $ISSUES; do
-            ISSUE_UPPERCASE=$(echo "$ISSUE" | tr '[:lower:]' '[:upper:]')
-            # Note: You'll need to map the extracted ISSUE to its corresponding Linear issue ID.
-            # The following is a placeholder for how you might perform the update.
-            # Replace `NEW_STATUS` with the appropriate status ID for your Linear setup.
-            NEW_STATUS='7db1c39e-bc7e-4c54-8ba9-eb0511002041'
-            JQ_PAYLOAD=$(jq -n \
-                              --arg id "$ISSUE_UPPERCASE" \
-                              --arg stateId "$NEW_STATUS" \
-                              '{query: "mutation($id: String!, $stateId: String!) { issueUpdate(id: $id, input: { stateId: $stateId }) { success } }", variables: {id: $id, stateId: $stateId}}')
-            echo $JQ_PAYLOAD
-            curl -X POST -H "Content-Type: application/json" -H "Authorization: $LINEAR_API_KEY" \
-                 --data "$JQ_PAYLOAD" \
-                 https://api.linear.app/graphql
-
-          done
+          LINEAR_API_TOKEN: ${{ secrets.LINEAR_API_TOKEN }}
+        run: ./.github/scripts/update_linear_issues.sh
