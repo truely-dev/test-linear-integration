@@ -34,7 +34,7 @@ jobs:
             # The following is a placeholder for how you might perform the update.
             # Replace `NEW_STATUS` with the appropriate status ID for your Linear setup.
             NEW_STATUS='7db1c39e-bc7e-4c54-8ba9-eb0511002041'
-            curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $LINEAR_API_KEY" \
+            curl -X POST -H "Content-Type: application/json" -H "Authorization: $LINEAR_API_KEY" \
             --data '{
               "query": "mutation($id: String!, $stateId: String!) { issueUpdate(id: $id, input: { stateId: $stateId }) { success } }",
               "variables": {
